@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="40">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    >
+    <title>Exchange Rates</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            margin: 20px;
+            text-align: left;
+        }
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        p {
+            color: #495057;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        #exchangeContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        #exchangeChart {
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        #lastUpdate {
+            font-size: 12px;
+            color: #868e96;
+        }
+        img {
+            max-width: 100%;
+            margin-left: auto; /* Align the image to the right */
+            margin-right: 0;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="col-md-6 offset-md-3 my-5">
+        <div class="card">
+            <div class="card-body">
+                <h1>KRW-VND Exchange Rates</h1>
+                <hr>
+            </div>
+            <div class="card-body">
+                <canvas id="exchangeChart" width="2000" height="1400"></canvas>
+            </div>
+        </div>
+             
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script>
+    // Data for the chart
+    var labels = ['E9Pay', 'Hanpass', 'Gmoney', 'Coinshot', 'GME', 'Sentbe', 'SBI', 'JRF', 'NAVER'];
+    var dataPoints = [
+        {{ exchange_rate_e9pay }},
+        {{ equivalent_amount_hanpass }},
+        {{ xrate_gmoney }},
+        {{ xrate_coinshot }},
+        {{ xrate_gme }},
+        {{ xrate_sentbe }},
+        {{ xrate_sbi }},
+        {{ xrate_jrf }},
+        {{ xrate_naver }}
+    ];
+
+    // Combine labels and data points into an array of objects
+    var data = labels.map((label, index) => ({ label, data: dataPoints[index] }));
+
+    // Sort data array in descending order based on data points
+    data.sort((a, b) => b.data - a.data);
+
+    // Extract sorted labels and data points
+    var sortedLabels = data.map(item => item.label);
+    var sortedDataPoints = data.map(item => item.data);
+
+    // Chart configuration
+    var options = {
+        indexAxis: 'y', // Use 'y' for horizontal bar chart
+        scales: {
+            xAxes: {
+                min: sortedDataPoints[8] - 50000,
+                max: sortedDataPoints[0] + 50000,
+                type: 'linear',
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    callback: function (value, index, values) {
+                        return (index === 0).toLocaleString() + ' VND ' || index === values.length - 1 ? value.toLocaleString() + ' VND ' : '';
+                    }
+                }
+            },
+            yAxes: [
+                {
+                    title: {
+                        display: true,
+                        text: 'Companies'
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            ]
+        },
+        plugins: {
+            legend: {
+                display: false, // Hide the legend
+            },
+            datalabels: {
+                anchor: 'end',
+                align: 'end',
+                formatter: function (value, context) {
+                    return value.toLocaleString(); // Format the label with commas
+                }
+            }
+        }
+    };    
+       
+
+    // Get the canvas element
+    var ctx = document.getElementById('exchangeChart').getContext('2d');
+    Chart.register(ChartDataLabels);
+    // Create the horizontal bar chart
+    var myBarChart = new Chart(ctx, {
+        type: 'bar', // Use 'bar' for horizontal bar chart
+        data: {
+            labels: sortedLabels,
+            datasets: [{
+                label: 'Exchange Rates',
+                data: sortedDataPoints,
+                // Assign different colors to each bar
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(555, 206, 86, 0.2)',
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(355, 199, 1132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(555, 120, 50, 1)',
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: options
+    });
+</script>  
+
+</body>
+</html>

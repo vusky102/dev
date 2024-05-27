@@ -1,0 +1,38 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
+import time
+
+
+
+
+# Set up Chrome options
+chrome_options = Options()
+chrome_options.add_argument('--headless')  # Run Chrome in headless mode to avoid opening a browser window
+
+# Create a Chrome webdriver with options
+driver = webdriver.Chrome(options=chrome_options)
+
+# Load the website
+url = 'https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=0&ie=utf8&query=krw+vnd'
+driver.get(url)
+
+#wait = WebDriverWait(driver, 5)
+
+
+# Find the input field with the specified CSS selector
+receiving_input = driver.find_element(By.XPATH, "//*[@data-value='up']")  #//*[@id="num"]
+
+# Get the value of the input field
+exchange_value = receiving_input.get_attribute('value')
+#exchange_rate_val=float(exchange_value.split()[0].replace(',', ''))
+#real_value= exchange_rate_val/995001*1000
+final_val = 100/float(exchange_value)*1000
+
+# Print the exchange value
+#print(f"GME Exchange Value: {real_value:,.0f}")
+print(f"Naver Exchange rate: {final_val:,.0f}")
+driver.quit()

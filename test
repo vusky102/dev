@@ -1,0 +1,41 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+
+# Set up Chrome options
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument('--headless')
+
+# Create a Chrome webdriver with options
+driver = webdriver.Chrome(options=chrome_options)
+
+# Open the webpage
+driver.get('https://coinshot.org/main')
+
+wait = WebDriverWait(driver, 10)
+
+
+button_element = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@value='vi']")))
+
+# Click on the button
+button_element.click()
+
+
+# Find the input element with the specified ID
+input_element = driver.find_element('xpath',"//input[@id='receiving-input']")
+
+# Extract the value of the input element
+exchange_rate_php = input_element.get_attribute('value')
+driver.quit()
+
+exchange_rate_float = float(exchange_rate_php.replace(',', ''))
+
+# Convert float to int
+exchange_rate_int = int(exchange_rate_float)
+
+exratevnd = exchange_rate_int
+print(f"{exratevnd:,.0f}")
+

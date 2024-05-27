@@ -1,0 +1,30 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+# Set up Chrome options
+chrome_options = Options()
+chrome_options.add_argument('--headless')  # Run Chrome in headless mode to avoid opening a browser window
+
+# Create a Chrome webdriver with options
+driver = webdriver.Chrome(options=chrome_options)
+
+# Load the website
+url = 'https://www.sbicosmoney.com/?lang=vi'
+driver.get(url)
+
+wait = WebDriverWait(driver, 1)
+
+# Find the input field with the specified XPath
+receiving_input = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input#targetAmount.input-dest-country.aos-init.aos-animate")))
+
+# Get the value of the input field
+exchange_value = receiving_input.get_attribute('value')
+final_val= float(exchange_value.split()[0].replace(',',''))/1000
+# Print the exchange value
+print(f"SBI Exchange rate: 1,000 KRW = {final_val:,.0f} VND")
+#print(exchange_value)
+# Close the browser
+driver.quit()

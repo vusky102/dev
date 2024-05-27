@@ -1,0 +1,108 @@
+import time
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+import re
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
+# List of URLs to open
+urls = [
+    "https://coinshot.org/main",
+    "https://online.gmeremit.com/"
+    # Add more URLs as needed
+]
+
+# Create a list of functions representing actions for each driver
+def process_page_1(driver):
+    # Custom logic for the first page
+    # Example: find an element by CSS selector and print its text
+    wait = WebDriverWait(driver, 10)
+    driver.implicitly_wait(10)
+    button_element = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@value='vi']")))
+
+    # Click on the button
+    button_element.click()
+
+
+    # Find the input element with the specified ID
+    input_element = driver.find_element('xpath',"//input[@id='receiving-input']")
+
+    # Extract the value of the input element
+    exchange_rate_php = input_element.get_attribute('value')
+    driver.quit()
+
+    exchange_rate_float = float(exchange_rate_php.replace(',', ''))
+
+    # Convert float to int
+    exchange_rate_int = int(exchange_rate_float)
+
+    exratevnd = exchange_rate_int*0.001
+    print(exratevnd)
+
+def process_page_2(driver):
+    # Custom logic for the second page
+    # Example: find an element by CSS selector and click it
+    wait = WebDriverWait(driver, 1)
+    driver.implicitly_wait(10)
+
+    button_element = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@id='nCountry']")))
+
+    button_element.click()
+
+    country_input = driver.find_element(By.ID, 'CountryValue')
+
+    # Click on the input field
+    country_input.click()
+
+    # Input "VN" into the field
+    country_input.send_keys('VN')
+
+
+
+    button_element_vn = wait.until(EC.element_to_be_clickable((By.XPATH, "//li[@data-countrycode='VND']")))
+
+    # Click on the button
+    button_element_vn.click()
+
+    #time.sleep(5)
+    #driver.implicitly_wait(10)
+
+
+    # Find the input field with the specified CSS selector
+    receiving_input = driver.find_element(By.CSS_SELECTOR, 'input#recAmt.form-control')
+
+    # Get the value of the input field
+    exchange_value = receiving_input.get_attribute('value')
+    exchange_rate_val=float(exchange_value.split()[0].replace(',', ''))
+    real_value= exchange_rate_val/995001*1000
+    
+    # Print the exchange value
+    print(f"GME Exchange Value: {real_value:,.0f}")
+
+# List of functions corresponding to each URL
+page_processes = [process_page_1, process_page_2]
+
+# Create a list to store the webdriver instances
+drivers = []
+
+# Open each URL in a separate webdriver instance
+for url in urls:
+    options = webdriver.ChromeOptions()
+    # Add any additional options as needed
+    
+    options.add_argument('--headless')
+    driver = webdriver.Chrome(options=options)
+    driver.get(url)
+    drivers.append(driver)
+    driver.implicitly_wait(10)
+
+# Perform actions on each page
+for driver, process_page in zip(drivers, page_processes):
+    # Call the specific function for the corresponding page
+    process_page(driver)
+
+# Close all webdriver instances
+for driver in drivers:
+    driver.quit()

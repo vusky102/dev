@@ -1,0 +1,26 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+
+# Set up Chrome options
+chrome_options = Options()
+chrome_options.add_argument('--headless')  # Run Chrome in headless mode to avoid opening a browser window
+
+# Create a Chrome webdriver with options
+driver = webdriver.Chrome(options=chrome_options)
+
+# Load the website
+url = 'https://coinshot.org/main'
+driver.get(url)
+
+# Find the input field with the specified CSS selector
+receiving_input = driver.find_element(By.CSS_SELECTOR, 'input#receiving-input.border-0.form-control')
+
+# Get the value of the input field
+exchange_value = receiving_input.get_attribute('value')
+
+# Print the exchange value
+print(f"Coinshot Exchange Value: {exchange_value}")
+
+# Close the webdriver
+driver.quit()

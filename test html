@@ -1,0 +1,402 @@
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+import re
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+import matplotlib.pyplot as plt
+import numpy as np
+import time
+
+
+def get_exchange_rate_hanpass():
+    url = 'https://hanpass.com/vn'
+
+    time.sleep(5)
+    # Set up Chrome options
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')  
+    time.sleep(5)
+    
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.implicitly_wait(20)
+    driver.get(url)
+    time.sleep(5)
+
+    
+    driver.implicitly_wait(20)
+
+    
+    html_content = driver.page_source
+
+    
+    soup = BeautifulSoup(html_content, 'html.parser')
+    driver.implicitly_wait(20)
+
+    time.sleep(5)
+    
+    exchange_rate_li = soup.find('li', id='reverseExchangeRate')
+    time.sleep(5)
+
+    
+    exchange_rate_text = exchange_rate_li.get_text(strip=True)
+    exchange_rate_value = exchange_rate_text.split(':')[1].strip()
+
+    
+    exchange_rate_float = float(exchange_rate_value.split()[0].replace(',', ''))
+    equivalent_amount_vnd = 1000 / exchange_rate_float
+
+    driver.quit()
+    return int(equivalent_amount_vnd*1000)
+
+def get_exchange_rate_e9pay():
+    url = 'https://e9pay.co.kr/'
+
+    
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')  
+
+    
+    driver = webdriver.Chrome(options=chrome_options)
+
+    driver.get(url)
+
+    
+    html_content = driver.page_source
+
+    
+    driver.quit()
+
+    
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    
+    exchange_rate_span = soup.find('span', id='display-exrate')
+    
+    
+    exchange_rate_text = exchange_rate_span.get_text(strip=True)
+    exchange_rate_value_str = exchange_rate_text.split("=")[1].strip()
+    numeric_str = ''.join(c for c in exchange_rate_value_str if c.isdigit() or c == '.')
+
+    
+    exchange_rate_float = float(numeric_str)
+
+    return int(exchange_rate_float*1000)
+
+def ex_rate_gmoney():
+
+
+    
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+
+
+    driver = webdriver.Chrome(options=chrome_options)
+
+
+    driver.get('https://mapi.gmoneytrans.net/exratenew1/Default.asp?country=viet%20nam')
+
+
+    wait = WebDriverWait(driver, 2)
+    span_element = wait.until(EC.presence_of_element_located((By.XPATH, "//span[@id='rate']")))
+
+    
+    exchange_rate = span_element.text.split("=")[1].strip()
+    #exchange_rate_value = exchange_rate_text.split(':')[1].strip()
+    #exchange_rate_value = float(exchange_rate.split('=')[1].strip())
+    exchange_rate_val=float(re.search(r'\d+\.\d+',exchange_rate).group())
+    eqval=1000*exchange_rate_val
+
+    driver.quit()
+    return int(eqval*1000)
+
+def ex_rate_coinshot():
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--headless')
+
+    driver = webdriver.Chrome(options=chrome_options)
+
+    driver.get('https://coinshot.org/main')
+
+    wait = WebDriverWait(driver, 10)
+
+    button_element = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@value='vi']")))
+
+    button_element.click()
+    
+    input_element = driver.find_element('xpath',"//input[@id='receiving-input']")
+
+    exchange_rate_php = input_element.get_attribute('value')
+    driver.quit()
+
+    exchange_rate_float = float(exchange_rate_php.replace(',', ''))
+
+    exchange_rate_int = int(exchange_rate_float)
+
+    exratevnd = exchange_rate_int*0.001
+    return int(exratevnd*1000)
+
+    
+
+    
+
+
+def get_exchange_rate_gme():
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+
+    time.sleep(5)
+    driver = webdriver.Chrome(options=chrome_options)
+
+    
+    url = 'https://online.gmeremit.com/'
+    driver.get(url)
+
+    wait = WebDriverWait(driver, 10)
+    time.sleep(5)
+
+    button_element = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@id='nCountry']")))
+
+    
+    button_element.click()
+
+    country_input = driver.find_element(By.ID, 'CountryValue')
+
+    
+    country_input.click()
+
+    country_input.send_keys('VN')
+
+    button_element_vn = wait.until(EC.element_to_be_clickable((By.XPATH, "//li[@data-countrycode='VND']")))
+    
+    button_element_vn.click()
+
+    driver.implicitly_wait(10)
+        
+    receiving_input = driver.find_element(By.CSS_SELECTOR, 'input#recAmt.form-control')
+
+    
+    exchange_value = receiving_input.get_attribute('value')
+    exchange_rate_val=float(exchange_value.split()[0].replace(',', ''))
+    real_value= exchange_rate_val/995001*1000
+    driver.quit()
+    
+    #print(f"GME Exchange Value: {real_value:,.0f}")
+    return int(real_value*1000)
+
+def get_exchange_rate_jrf():
+    from selenium import webdriver
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.common.by import By
+    import pyautogui
+    
+
+    
+    chrome_options = Options()
+    #chrome_options.add_argument('--headless')  
+
+    
+    driver = webdriver.Chrome(options=chrome_options)
+    pyautogui.hotkey('alt','tab')
+    
+    url = 'https://www.jpremit.co.kr/'
+    driver.get(url)
+    #pyautogui.hotkey('alt','tab')
+    #time.sleep(1)
+    #wait = WebDriverWait(driver, 5)
+
+    button_element=driver.find_element(By.CLASS_NAME, 'select_co')
+    button_element.click()
+    co_list_ul = driver.find_element(By.CLASS_NAME, 'co-list')
+    driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight;", co_list_ul)
+    button_element_vn =driver.find_element(By.ID, 'VND')
+    button_element_vn.click()
+
+
+
+    
+    receiving_input = driver.find_element(By.CSS_SELECTOR, 'input#rec_money')
+
+    
+    exchange_value = receiving_input.get_attribute('value')
+    exchange_rate_val=float(exchange_value.split()[0].replace(',', ''))/1000
+    #real_value= exchange_rate_val/995001*1000
+
+
+    
+    #print(f"GME Exchange Value: {real_value:,.0f}")
+    return int(exchange_rate_val*1000)
+    
+
+
+def get_exchange_rate_sentbe():
+
+    
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')  # Run Chrome in headless mode to avoid opening a browser window
+
+    
+    driver = webdriver.Chrome(options=chrome_options)
+
+    
+    url = 'https://www.sentbe.com/vi?source_country=KR'
+    driver.get(url)
+
+    wait = WebDriverWait(driver, 10)
+
+    
+    receiving_input = wait.until(EC.presence_of_element_located((By.XPATH, "//*[@id='receiveAmount']")))
+
+    
+    exchange_value = receiving_input.get_attribute('value')
+    final_val= float(exchange_value.split()[0].replace(',',''))/1000
+    
+    #print(f"Sentbe Exchange rate: 1,000 KRW = {final_val:,.0f} VND")
+
+    
+    driver.quit()
+    return int(final_val*1000)
+
+
+def get_exchange_rate_sbi():
+
+    
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')  
+
+    driver = webdriver.Chrome(options=chrome_options)
+
+    
+    url = 'https://www.sbicosmoney.com/?lang=vi'
+    driver.get(url)
+
+    wait = WebDriverWait(driver, 1)
+
+    receiving_input = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input#targetAmount.input-dest-country.aos-init.aos-animate")))
+
+    
+    exchange_value = receiving_input.get_attribute('value')
+    final_val= float(exchange_value.split()[0].replace(',',''))/1000
+    
+    #print(f"SBI Exchange rate: 1,000 KRW = {final_val:,.0f} VND")
+    #print(exchange_value)
+    
+    driver.quit()
+    return int(final_val*1000)
+
+
+def get_exchange_rate_naver():
+    
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')  # Run Chrome in headless mode to avoid opening a browser window
+
+    
+    driver = webdriver.Chrome(options=chrome_options)
+
+    
+    url = 'https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=0&ie=utf8&query=krw+vnd'
+    driver.get(url)
+
+    #wait = WebDriverWait(driver, 5)
+
+
+    
+    receiving_input = driver.find_element(By.XPATH, "//*[@data-value='up']")  #//*[@id="num"]
+
+    
+    exchange_value = receiving_input.get_attribute('value')
+    #exchange_rate_val=float(exchange_value.split()[0].replace(',', ''))
+    #real_value= exchange_rate_val/995001*1000
+    final_val = 100/float(exchange_value)*1000
+
+    
+    #print(f"GME Exchange Value: {real_value:,.0f}")
+    #print(f"Naver Exchange rate: {final_val:,.0f}")
+    driver.quit()
+    return int(final_val*1000)
+
+
+
+exchange_rate_e9pay = get_exchange_rate_e9pay()
+equivalent_amount_hanpass = get_exchange_rate_hanpass()
+xrate_gmoney = ex_rate_gmoney()
+xrate_coinshot = ex_rate_coinshot()
+xrate_gme = get_exchange_rate_gme()
+xrate_jrf = get_exchange_rate_jrf()
+xrate_sentbe = get_exchange_rate_sentbe()
+xrate_sbi = get_exchange_rate_sbi()
+xrate_naver = get_exchange_rate_naver()
+
+
+# Exchange rates data
+exchange_rates = {
+    'E9Pay': exchange_rate_e9pay,
+    'Hanpass': equivalent_amount_hanpass,
+    'Gmoney': xrate_gmoney,
+    'Coinshot': xrate_coinshot,
+    'GME': xrate_gme,
+    'Sentbe': xrate_sentbe,
+    'SBI': xrate_sbi,
+    'JRF': xrate_jrf,
+    'NAVER': xrate_naver,
+}
+
+
+# Sort the data by values in descending order
+sorted_data = sorted(exchange_rates.items(), key=lambda x: x[1], reverse=False)
+names, values = zip(*sorted_data)
+
+
+values = [int(value) for value in values]
+
+
+colors = plt.cm.viridis(np.linspace(0, 1, len(names)))
+
+# Plotting the bar graph
+plt.figure(figsize=(10, 5))
+bars = plt.barh(names, values, color=colors, edgecolor='black')  # Use values directly without np.log()
+
+plt.xlabel('Exchange Services')
+#plt.ylabel('Equivalent Amount in VND for 1,000,000 KRW')
+plt.title('Exchange Rates Comparison')
+
+plt.xscale('log')
+
+for bar, value in zip(bars, values):
+    plt.text(bar.get_width(), bar.get_y() + bar.get_height() / 2, f'{value:,}', va='center', fontsize=8)
+
+plt.savefig('exchange_rates_chart.png')
+
+# Display the plot
+#plt.show()
+
+
+from jinja2 import Template
+
+
+
+# Results
+results = {
+    'exchange_rate_e9pay': exchange_rate_e9pay,
+    'equivalent_amount_hanpass': equivalent_amount_hanpass,
+    'xrate_gmoney': xrate_gmoney,
+    'xrate_coinshot': xrate_coinshot,
+    'xrate_gme': xrate_gme,
+    'xrate_jrf': xrate_jrf,
+    'xrate_sentbe': xrate_sentbe,
+    'xrate_sbi': xrate_sbi,
+    'xrate_naver': xrate_naver,
+}
+
+
+with open(r'C:\Users\Oxana&Lucas\Desktop\dev\python\Template.html', 'r') as template_file:
+    template_content = template_file.read()
+    template = Template(template_content)
+
+
+html_output = template.render(**results)
+
+with open('exchange_rates_output.html', 'w') as output_file:
+    output_file.write(html_output)
+

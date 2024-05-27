@@ -1,0 +1,58 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+
+# Set up Chrome options
+chrome_options = Options()
+chrome_options.add_argument('--headless')  # Run Chrome in headless mode to avoid opening a browser window
+
+# Create a Chrome webdriver with options
+driver = webdriver.Chrome(options=chrome_options)
+
+# Load the website
+url = 'https://online.gmeremit.com/'
+driver.get(url)
+
+wait = WebDriverWait(driver, 1)
+
+
+button_element = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@id='nCountry']")))
+
+# Click on the button
+button_element.click()
+
+country_input = driver.find_element(By.ID, 'CountryValue')
+
+# Click on the input field
+country_input.click()
+
+# Input "VN" into the field
+country_input.send_keys('VN')
+
+
+
+button_element_vn = wait.until(EC.element_to_be_clickable((By.XPATH, "//li[@data-countrycode='VND']")))
+
+# Click on the button
+button_element_vn.click()
+
+#time.sleep(5)
+#driver.implicitly_wait(10)
+
+
+# Find the input field with the specified CSS selector
+receiving_input = driver.find_element(By.CSS_SELECTOR, 'input#recAmt.form-control')
+
+# Get the value of the input field
+exchange_value = receiving_input.get_attribute('value')
+exchange_rate_val=float(exchange_value.split()[0].replace(',', ''))
+real_value= exchange_rate_val/995001*1000
+driver.quit()
+# Print the exchange value
+print(f"GME Exchange Value: {real_value:,.0f}")
+
+
+

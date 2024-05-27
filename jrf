@@ -1,0 +1,52 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+#from selenium.webdriver.support import expected_conditions as EC
+#from selenium.webdriver.common.action_chains import ActionChains
+import time
+import pyautogui
+
+
+
+# Set up Chrome options
+chrome_options = Options()
+#chrome_options.add_argument('--headless')  # Run Chrome in headless mode to avoid opening a browser window
+
+# Create a Chrome webdriver with options
+driver = webdriver.Chrome(options=chrome_options)
+
+#pyautogui.click(300,500)
+# Load the website
+pyautogui.hotkey('alt','tab')
+
+url = 'https://www.jpremit.co.kr/'
+driver.get(url)
+
+#driver.switch_to.window(driver.window_handles[0])
+
+
+#wait = WebDriverWait(driver, 5)
+
+button_element=driver.find_element(By.CLASS_NAME, 'select_co')
+button_element.click()
+co_list_ul = driver.find_element(By.CLASS_NAME, 'co-list')
+driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight;", co_list_ul)
+button_element_vn =driver.find_element(By.ID, 'VND')
+button_element_vn.click()
+
+
+
+# Find the input field with the specified CSS selector
+receiving_input = driver.find_element(By.CSS_SELECTOR, 'input#rec_money')
+
+# Get the value of the input field
+exchange_value = receiving_input.get_attribute('value')
+#exchange_rate_val=float(exchange_value.split()[0].replace(',', ''))
+#real_value= exchange_rate_val/995001*1000
+
+
+# Print the exchange value
+#print(f"GME Exchange Value: {real_value:,.0f}")
+print(exchange_value)
+#driver.quit()

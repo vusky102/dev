@@ -1,0 +1,29 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import re
+
+# Set up Chrome options
+chrome_options = Options()
+chrome_options.add_argument('--headless')
+
+# Create a Chrome webdriver with options
+driver = webdriver.Chrome(options=chrome_options)
+
+# Open the webpage
+driver.get('https://mapi.gmoneytrans.net/exratenew1/Default.asp?country=viet%20nam')
+
+# Use WebDriverWait to wait for the span element containing the exchange rate
+wait = WebDriverWait(driver, 20)
+span_element = wait.until(EC.presence_of_element_located((By.XPATH, "//span[@id='rate']")))
+
+# Extract the text content of the span element
+exchange_rate = span_element.text
+
+exchange_rate_val=float(re.search(r'\d+\.\d+',exchange_rate).group())
+eqval=1000*exchange_rate_val
+print(f"{eqval:,.0f}")
+
+driver.quit()

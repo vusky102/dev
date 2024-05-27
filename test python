@@ -1,0 +1,94 @@
+import requests
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+import matplotlib.pyplot as plt
+
+def get_exchange_rate_hanpass():
+    url = 'https://hanpass.com/vn'
+
+    # Set up Chrome options
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')  # Run Chrome in headless mode to avoid opening a browser window
+
+    # Create a Chrome webdriver with options
+    driver = webdriver.Chrome(options=chrome_options)
+
+    driver.get(url)
+
+    # Allow some time for JavaScript to render the content
+    driver.implicitly_wait(10)
+
+    # Get the page source after JavaScript has rendered the content
+    html_content = driver.page_source
+
+    # Close the webdriver
+    driver.quit()
+
+    # Parse HTML content
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    # Find the li element with the id "reverseExchangeRate"
+    exchange_rate_li = soup.find('li', id='reverseExchangeRate')
+
+    # Check if the element is found
+    if exchange_rate_li:
+        # Extract the exchange rate value
+        exchange_rate_text = exchange_rate_li.get_text(strip=True)
+        exchange_rate_value = exchange_rate_text.split(':')[1].strip()
+
+        # Calculate the equivalent amount in VND for 1000 KRW
+        exchange_rate_float = float(exchange_rate_value.split()[0].replace(',', ''))
+        equivalent_amount_vnd = 1000 / exchange_rate_float
+
+        return equivalent_amount_vnd
+    else:
+        # Handle the case when the element is not found
+        print("Element with id 'reverseExchangeRate' not found. Returning None.")
+        return None
+
+def get_exchange_rate_e9pay():
+    url = 'https://e9pay.co.kr/'
+
+    # Set up Chrome options
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')  # Run Chrome in headless mode to avoid opening a browser window
+
+    # Create a Chrome webdriver with options
+    driver = webdriver.Chrome(options=chrome_options)
+
+    driver.get(url)
+
+    # Get the page source after JavaScript has rendered the content
+    html_content = driver.page_source
+
+    # Close the webdriver
+    driver.quit()
+
+    # Parse HTML content
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    # Find the span with id "display-exrate"
+    exchange_rate_span = soup.find('span', id='display-exrate')
+
+    # Extract the text content of the span
+    exchange_rate_text = exchange_rate_span.get_text(strip=True)
+
+    print(f"E9Pay Exchange Rate: {exchange_rate_text}")
+
+# Call the functions to get exchange rates from both websites
+exchange_rate_e9pay = get_exchange_rate_e9pay()
+equivalent_amount_hanpass = get_exchange_rate_hanpass()
+
+# Print the results at the end
+print(f"E9Pay Exchange Rate: {exchange_rate_e9pay}")
+
+# Plotting the data
+labels = ['E9Pay', 'Hanpass']
+exchange_rates = [float(exchange_rate_e9pay), float(equivalent_amount_hanpass)]
+    
+
+fig, ax1 = plt.subplots()
+
+# Plot exchange rates on the left y-axis
+ax1.bar(labels, exchange_rates, color='b', alpha=0.7)

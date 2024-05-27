@@ -1,0 +1,10 @@
+from bs4 import BeautifulSoup
+import requests
+url='https://www.sentbe.com/vi?source_country=KR'
+html = requests.get(url)
+
+soup = BeautifulSoup(html.text,'html.parser')
+
+t= soup.find_all('class')
+
+print(t)

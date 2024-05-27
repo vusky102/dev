@@ -1,0 +1,30 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+# Set up Chrome options
+chrome_options = Options()
+chrome_options.add_argument('--headless')  # Run Chrome in headless mode to avoid opening a browser window
+
+# Create a Chrome webdriver with options
+driver = webdriver.Chrome(options=chrome_options)
+
+# Load the website
+url = 'https://www.sentbe.com/vi?source_country=KR'
+driver.get(url)
+
+wait = WebDriverWait(driver, 1)
+
+# Find the input field with the specified XPath
+receiving_input = wait.until(EC.presence_of_element_located((By.XPATH, "//*[@id='receiveAmount']")))
+
+# Get the value of the input field
+exchange_value = receiving_input.get_attribute('value')
+final_val= float(exchange_value.split()[0].replace(',',''))/1000
+# Print the exchange value
+print(f"Sentbe Exchange rate: 1,000 KRW = {final_val:,.0f} VND")
+
+# Close the browser
+driver.quit()
