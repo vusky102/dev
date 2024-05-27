@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <title>Flask Button Click Example</title>
+    <style>
+        body {
+            padding-left: 5%;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            font-size: small;
+            font-weight: bolder;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 1600px;
+        }
+
+        form {
+            display: flex;
+            height: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        #result {
+            display: flex;
+            height: 100%;
+            padding-left: 14%;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        #loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(10%);
+        }
+        #trip_type {
+            align-self: flex-start;
+        }
+        img {
+            justify-content: center;
+            align-items: center;
+            width: 40%;
+            height: 40%;
+            opacity: 50%;
+        }
+        #arrival_date,#arrival_date_label {
+            display: none;
+        }
+        
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+    <body>
+        <div class="col-md-6 offset-md-3 my-5">
+            <div class="card">
+                <div class="card-body">
+                    <form id="searchForm">
+                        <label for="trip_type">Trip Type:</label>
+                        <select id="trip_type" name="trip_type">
+                            <option value="one_way">One Way</option>
+                            <option value="round_trip">Roundtrip</option>
+                        </select>
+    
+                        <label for="origin_code">Origin Code:</label>
+                        <select id="origin_code" name="origin_code">
+                            <option value="ICN">ICN</option>
+                            <option value="PUS">PUS</option>
+                            <option value="HAN">HAN</option>
+                            <option value="SGN">SGN</option>
+                        </select>
+    
+                        <label for="destination_code">Destination Code:</label>
+                        <select id="destination_code" name="destination_code">
+                            <option value="ICN">ICN</option>
+                            <option value="PUS">PUS</option>
+                            <option value="HAN">HAN</option>
+                            <option value="SGN">SGN</option>
+                        </select>
+    
+                        <label for="departure_date">Departure Date:</label>
+                        <input type="date" id="departure_date" name="departure_date">
+    
+                        <label for="arrival_date" id="arrival_date_label">Arrival Date:</label>
+                        <input type="date" id="arrival_date" name="arrival_date">
+    
+                        <button type="button" id="searchButton">Search</button>
+                    </form>
+                    <hr>
+                    <div class="centered" id="loading">
+                        <img src="/static/image_processing20201104-17229-1v7zhws.gif" alt="Loading...">
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="result">Result will be displayed here</div>
+                </div>
+            </div>
+        </div>
+        
+
+    
+
+    
+
+    <script>
+        $(document).ready(function () {
+            $('#arrival_date_label,#arrival_date').hide();
+
+            $('#trip_type').on('change', function() {
+                if ($(this).val() === 'round_trip') {
+                    $('#arrival_date_label,#arrival_date').show();
+                } else {
+                    $('#arrival_date_label,#arrival_date').hide();
+                }
+            });
+
+            $("#loading").show();
+            $("#loading").hide();
+            $("#searchButton").click(function () {
+                
+                $("#loading").show();
+
+                
+                var formData = {
+                    trip_type:$("#trip_type").val(),
+                    origin_code: $("#origin_code").val(),
+                    destination_code: $("#destination_code").val(),
+                    departure_date: $("#departure_date").val(),
+                    arrival_date: $("#arrival_date").val()
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: "/button_click",
+                    data: formData,
+                    success: function (response) {
+                        
+                        $("#loading").hide();
+                        $("#result").html(response);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

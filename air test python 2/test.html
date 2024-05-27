@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Details</title>
+    <style>
+        /* Add your CSS styles here if needed */
+        .flight-detail {
+            border: 1px solid #ccc;
+            margin: 10px;
+            padding: 10px;
+        }
+
+        .detail-heading {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="flightDetailsContainer"></div>
+
+    <script>
+        const flightDetailsData = [
+            // Your flight details data here
+            // Example data:
+            { Key: "RcEI4vSqWDKAIfg3IAAAAA==", Origin: "ICN", Destination: "BKK", DepartureTime: "2023-12-22T21:35:00.000+09:00", ArrivalTime: "2023-12-23T01:25:00.000+07:00", FlightTime: 350, TravelTime: 350, Equipment: "738", OriginTerminal: "1" },
+            // Add more flight details as needed
+        ];
+
+        // Function to create and append HTML elements for each flight detail
+        function createFlightDetailElement(flightDetail) {
+            const element = document.createElement('div');
+            element.className = 'flight-detail';
+
+            const keys = Object.keys(flightDetail);
+            keys.forEach(key => {
+                const detailElement = document.createElement('p');
+                detailElement.className = 'detail-heading';
+                detailElement.innerHTML = `<strong>${key}:</strong> ${flightDetail[key]}`;
+                element.appendChild(detailElement);
+            });
+
+            return element;
+        }
+
+        // Function to render flight details to HTML
+        function renderFlightDetails() {
+            const container = document.getElementById('flightDetailsContainer');
+
+            flightDetailsData.forEach(flightDetail => {
+                const flightDetailElement = createFlightDetailElement(flightDetail);
+                container.appendChild(flightDetailElement);
+            });
+        }
+
+        // Call the renderFlightDetails function when the page loads
+        window.onload = renderFlightDetails;
+    </script>
+</body>
+</html>
