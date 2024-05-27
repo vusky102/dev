@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Search</title>
+    <style>
+        #calendar {
+            display: grid;
+            border: 1px solid #ddd;
+            padding: 10px;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .day {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .column-title {
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Flight Search</h1>
+    <form id="flightSearchForm">
+        <label for="origin">Origin:</label>
+        <input type="text" id="origin" name="origin" required>
+        
+        <label for="destination">Destination:</label>
+        <input type="text" id="destination" name="destination" required>
+        
+        <label for="departureDate">Departure Date:</label>
+        <input type="date" id="departureDate" name="departureDate" required>
+        
+        <button type="button" onclick="searchFlights()">Search Flights</button>
+    </form>
+
+    <div id="calendar"></div>
+
+    <script>
+        function searchFlights() {
+            // Get user inputs
+            const origin = document.getElementById("origin").value;
+            const destination = document.getElementById("destination").value;
+            const departureDate = document.getElementById("departureDate").value;
+
+            // Make AJAX request to Python code
+            const xhr = new XMLHttpRequest();
+            const url = `/button_click?origin=${origin}&destination=${destination}&departure_date=${departureDate}`;
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    const response = JSON.parse(xhr.responseText);
+                    displayCalendar(response);
+                } else {
+                    console.error("Error in AJAX request");
+                }
+            };
+
+            xhr.send();
+        }
+
+        function displayCalendar(data) {
+            // Assuming data is a dictionary with date as key and price as value
+            const calendarDiv = document.getElementById("calendar");
+            calendarDiv.innerHTML = ""; // Clear previous content
+
+            const departureDate = new Date(document.getElementById("departureDate").value);
+            
+            const lastDay = new Date(departureDate.getFullYear(), departureDate.getMonth() + 1, 0).getDate();
+            
+            const dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+            for (const title of dayOfWeek) {
+                const titleElement = document.createElement("div");
+                titleElement.classList.add("column-title");
+                titleElement.textContent = title;
+                calendarDiv.appendChild(titleElement);
+            }
+
+            const firstDayOfMonth = new Date(departureDate.getFullYear(), departureDate.getMonth(), 1).getDay();
+
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                // Add empty placeholders for days before the first day of the month
+                const emptyDayElement = document.createElement("div");
+                calendarDiv.appendChild(emptyDayElement);
+            }
+
+            for (let day = 1; day <= lastDay; day++) {
+                const dateKey = new Date(departureDate.getFullYear(), departureDate.getMonth(), day).toISOString().split('T')[0];
+                const price = data[dateKey] || ' ';
+
+                const dayElement = document.createElement("div");
+                dayElement.classList.add("day");
+                dayElement.innerHTML = `<div>${day}</div><div>${price}</div>`;
+                calendarDiv.appendChild(dayElement);
+            }
+
+        }
+    </script>
+</body>
+</html>

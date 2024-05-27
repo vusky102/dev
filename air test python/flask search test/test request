@@ -1,0 +1,53 @@
+
+import base64
+import requests
+#import xmltodict
+
+url = "https://apac.universal-api.pp.travelport.com/B2BGateway/connect/uAPI/AirService"
+
+authHeader = base64.b64encode(
+        ('Universal API/uAPI7426835859-9d6c0257' + ':' + 'i+5JA4r!m/').encode()).decode()
+
+headers = {
+    'Content-Type': 'text/xml; charset=utf-8',
+    'Accept': 'gzip,deflate',
+    'Authorization': 'Basic ' + authHeader
+}
+
+body = """
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <air:LowFareSearchReq AuthorizedBy="MODETOUREDEV" TraceId="2023020210102121" TargetBranch="P7200564" ReturnUpsellFare="false"  SolutionResult="true" xmlns:air="http://www.travelport.com/schema/air_v52_0" xmlns:com="http://www.travelport.com/schema/common_v52_0">
+      <com:BillingPointOfSaleInfo OriginApplication="uAPI"/>
+         <air:SearchAirLeg>
+            <air:SearchOrigin>
+               <com:Airport Code="ICN"/>
+            </air:SearchOrigin>
+            <air:SearchDestination>
+               <com:Airport Code="BKK"/>
+            </air:SearchDestination>
+            <air:SearchDepTime PreferredTime="2023-12-22"/>
+         </air:SearchAirLeg>
+                  
+
+         <air:AirSearchModifiers>
+            <air:PreferredProviders>
+               <com:Provider Code="1G"/>
+            </air:PreferredProviders>
+            
+          <air:FlightType DoubleInterlineCon="false" DoubleOnlineCon="false" SingleInterlineCon="false" SingleOnlineCon="true" StopDirects="true" NonStopDirects="true"/>
+         </air:AirSearchModifiers>
+         <com:SearchPassenger BookingTravelerRef="ADT01" Code="ADT"/>
+      <com:SearchPassenger BookingTravelerRef="CNN01" Code="CNN" Age="8" />
+      <com:SearchPassenger BookingTravelerRef="INF01" Code="INF" Age="1" />
+         <air:AirPricingModifiers AccountCodeFaresOnly="false" ETicketability="Required" FaresIndicator="AllFares">
+         </air:AirPricingModifiers>
+      </air:LowFareSearchReq>
+   </soap:Body>
+</soap:Envelope>
+"""
+
+response = requests.post(url, headers=headers, data=body)
+#result = xmltodict.parse(response.text)
+
+print(response.text)

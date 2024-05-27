@@ -1,0 +1,134 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+import time
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from datetime import datetime
+from selenium.webdriver.common.action_chains import ActionChains
+
+
+
+chrome_options = Options()
+chrome_options.add_argument('--headless')
+chrome_options.add_argument("--enable-javascript")
+
+
+    
+driver = webdriver.Chrome(options=chrome_options)
+
+    
+url = 'https://ibe.za.quickprs.com/pc/homePage'
+driver.get(url)
+
+current_date = datetime.now()
+
+departure_date = datetime.strptime("2024-02-20", "%Y-%m-%d")
+
+day_value = departure_date.day
+
+month_difference = (departure_date.year - current_date.year) * 12 + departure_date.month - current_date.month
+
+origin = "icn"
+destination = "pnh"
+
+
+
+driver.maximize_window()
+
+wait = WebDriverWait(driver, 10)
+
+button_element = driver.find_element(By.CLASS_NAME, 'ts-btn.m-btn-main-continue')
+
+
+button_element.click()
+
+driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+
+label_element = driver.find_element(By.XPATH, '//label[@role="radio" and @tabindex="-1" and @class="el-radio"]')
+label_element.click()
+
+
+button_element = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input#fromcity')))
+
+    
+button_element.click()
+button_element.send_keys({origin})
+
+li_element = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "span.fl.fromCityName")))
+
+
+li_element.click()
+
+button_element = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input#tocity')))
+
+    
+button_element.click()
+button_element.send_keys({destination})
+
+li_element = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "span.fl.toCityName")))
+
+# Click on the list element
+li_element.click()
+
+button_element = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "input.from-date")))
+button_element.click()
+
+driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+if month_difference > 0:
+    
+    for _ in range(month_difference):
+        button_element = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "i.el-icon-arrow-right")))
+        button_element.click()
+        time.sleep(1)
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(2)
+
+    span_element = driver.find_element(By.XPATH, f'//span[text()="{day_value}"]')
+    span_element.click()
+    
+elif month_difference == 0:
+    
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    # button_element = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "i.el-icon-arrow-right")))
+    # button_element.click()
+    # time.sleep(2)
+    # button_element = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "i.el-icon-arrow-left")))
+    # button_element.click()
+    time.sleep(2)
+
+    actions = ActionChains(driver)
+    span_element = driver.find_element(By.XPATH, f'//span[text()="{day_value}"]')  
+    actions.move_to_element(span_element).click().perform()
+else:
+    
+    print("Departure date is in the past")
+
+# time.sleep(120)
+# span_element = driver.find_element(By.XPATH, f'//span[@class="red" and text()="{day_value}"]')
+# span_element.click()
+driver.implicitly_wait(20)
+button_xpath = '//button[@class="ts-btn m-btn-main-search"]'
+driver.implicitly_wait(20)
+button_element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, button_xpath)))
+
+
+actions = ActionChains(driver)
+actions.move_to_element(button_element).click().perform()
+
+driver.implicitly_wait(20)
+time.sleep(4)
+span_element = driver.find_element(By.CLASS_NAME, 'btnMoney')
+actions.move_to_element(span_element).perform()
+
+
+text_value = span_element.text
+
+
+print(f'{departure_date} Ticket price: ${text_value}')
+
+driver.quit()
+    
+        
