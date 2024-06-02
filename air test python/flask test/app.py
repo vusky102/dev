@@ -15,7 +15,7 @@ def button_click():
     
 
     url = "https://apac.universal-api.pp.travelport.com/B2BGateway/connect/uAPI/AirService"
-    authHeader = base64.b64encode(('Universal API/uAPI7426835859-9d6c0257' + ':' + 'i+5JA4r!m/').encode()).decode()
+    authHeader = base64.b64encode(('Universal API/-' + ':' + 'i+5JA4r!m/').encode()).decode()
     headers = {
         'Content-Type': 'text/xml; charset=utf-8',
         'Accept': 'gzip,deflate',
@@ -41,7 +41,7 @@ def button_click():
         body = f"""
             <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
             <soap:Body>
-                <air:LowFareSearchReq AuthorizedBy="MODETOUREDEV" TraceId="2023020210102121" TargetBranch="P7200564" ReturnUpsellFare="false"  SolutionResult="true" xmlns:air="http://www.travelport.com/schema/air_v52_0" xmlns:com="http://www.travelport.com/schema/common_v52_0">
+                <air:LowFareSearchReq AuthorizedBy="MODETOUREDEV" TraceId="" TargetBranch="" ReturnUpsellFare="false"  SolutionResult="true" xmlns:air="http://www.travelport.com/schema/air_v52_0" xmlns:com="http://www.travelport.com/schema/common_v52_0">
                 <com:BillingPointOfSaleInfo OriginApplication="uAPI"/>
                     <air:SearchAirLeg>
                         <air:SearchOrigin>
